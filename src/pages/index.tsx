@@ -128,7 +128,7 @@ export default function Home() {
                       withBorder
                       p="md"
                       mb="xs"
-                      w="400px"
+                      w="375px"
                     >
                       <Group align="center" position="apart" noWrap>
                         <Text weight={500}>{todo}</Text>
