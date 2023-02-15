@@ -13,7 +13,7 @@ import {
 import Layout from "./components/LayoutPage/Layout";
 import { TbEdit, TbPlus, TbCheck, TbCross, TbX } from "react-icons/tb";
 import { Modal } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [todos, setTodos] = useState<String[]>([]);
@@ -21,15 +21,26 @@ export default function Home() {
   const [editTodo, setEditTodo] = useState<{ todo: String; index: number }>();
   const [input, setInput] = useState("");
   const [editInput, setEditInput] = useState("");
+  const [error, setError] = useState("");
 
   const handleAddTodo = () => {
-    setTodos([...todos, input]);
+    if (!input) {
+      setError("This input cannot be empty");
+      return;
+    }
+    setError("");
+    const newTodos = [...todos, input];
+    setTodos(newTodos);
+
+    localStorage.setItem("todos", JSON.stringify(newTodos));
     setInput("");
   };
 
   const handleOnDelete = (index: number) => {
     const newTodos = todos.filter((todo, i) => i !== index);
     setTodos(newTodos);
+
+    localStorage.setItem("todos", JSON.stringify(newTodos));
   };
 
   const handleOpenModal = (index: number) => {
@@ -39,14 +50,17 @@ export default function Home() {
   };
 
   const handleOnEdit = (index: number) => {
-    setTodos((prev) => {
-      console.log({ prev });
-      const newTodos = [...prev];
-      newTodos[index] = editInput;
-      return newTodos;
-    });
+    const newTodos = [...todos];
+    newTodos[index] = editInput;
+    setTodos(newTodos);
+    localStorage.setItem("todos", JSON.stringify(newTodos));
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    const storedTodos = localStorage.getItem("todos");
+    if (storedTodos) setTodos(JSON.parse(storedTodos));
+  }, []);
 
   return (
     <>
@@ -74,6 +88,7 @@ export default function Home() {
           </Group>
         </Stack>
       </Modal>
+
       <Layout>
         <Head>
           <title>Todo List</title>
@@ -83,8 +98,9 @@ export default function Home() {
         </Head>
         <Center>
           <Stack align="center">
-            <Group spacing="xs">
+            <Group align="start" spacing="xs">
               <TextInput
+                error={error ? error : undefined}
                 value={input}
                 onChange={(e: any) => {
                   setInput(e.target.value);
@@ -117,7 +133,7 @@ export default function Home() {
                       <Group align="center" position="apart" noWrap>
                         <Text weight={500}>{todo}</Text>
 
-                        <Group spacing="xs">
+                        <Group spacing="xs" noWrap>
                           <ActionIcon
                             color={"teal.7"}
                             onClick={() => {
