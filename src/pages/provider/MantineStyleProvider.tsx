@@ -47,7 +47,7 @@ function MantineStyleProvider({ children }: { children: ReactNode }) {
               ],
             },
             primaryColor: "light",
-            primaryShade: 8,
+            primaryShade: 7,
             components: {
               Button: {
                 defaultProps: {},
